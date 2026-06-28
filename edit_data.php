@@ -1,10 +1,10 @@
 <?php
 session_start();
-
-// ตรวจสอบสิทธิ์การเข้าถึง (เฉพาะ Admin)
-require_once 'auth_check.php';
 require_once 'db.php';
-
+if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
+    header("Location: admin_login.php");
+    exit();
+}
 $current_page = 'settings';
 $error_msg = '';
 
@@ -123,6 +123,11 @@ if (!$user_data) {
                 <i data-lucide="settings" class="w-5 h-5"></i> Settings
             </a>
         </nav>
+        <div class="p-4 border-t border-slate-100">
+            <a href="logout.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
+                <i data-lucide="log-out" class="w-5 h-5"></i> ออกจากระบบ
+            </a>
+        </div>
     </div>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">

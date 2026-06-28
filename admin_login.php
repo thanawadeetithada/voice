@@ -161,6 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <?php if(!empty($modalMessage)): ?>
         showAlert("<?php echo addslashes($modalMessage); ?>", "<?php echo $modalType; ?>");
     <?php endif; ?>
+
+        console.log("Check Session after login:", <?php echo json_encode($_SESSION ?? []); ?>);
+
     </script>
 </body>
 </html>

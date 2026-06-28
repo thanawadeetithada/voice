@@ -1,19 +1,27 @@
 <?php
-require_once 'auth_check.php';
+session_start();
 require_once 'db.php';
-
+if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
+    header("Location: admin_login.php");
+    exit();
+}
 $current_page = 'dashboard';
 
 // --- จัดการตัวกรอง (Filter) ปีและไตรมาส ---
 $selected_year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
-$selected_quarter = isset($_GET['quarter']) ? intval($_GET['quarter']) : ceil(date('n') / 3);
+
+// เช็คว่าค่า quarter ที่ส่งมาเป็น 'all' หรือไม่
+if (isset($_GET['quarter']) && $_GET['quarter'] === 'all') {
+    $selected_quarter = 'all';
+} else {
+    // ถ้าไม่ใช่ 'all' (เป็นตัวเลข) ถึงจะครอบด้วย intval() ถ้าไม่มีค่าให้ใช้ไตรมาสปัจจุบัน
+    $selected_quarter = isset($_GET['quarter']) ? intval($_GET['quarter']) : ceil(date('n') / 3);
+}
 
 // สร้างเงื่อนไข Query
 $whereClause = "WHERE YEAR(created_at) = $selected_year";
-if ($selected_quarter != 'all') {
+if ($selected_quarter !== 'all') {
     $whereClause .= " AND QUARTER(created_at) = $selected_quarter";
-} else {
-    $selected_quarter = 'all';
 }
 
 // --- 1. ดึงข้อมูลตั๋วทั้งหมดในไตรมาสที่เลือกเพื่อนำมาประมวลผล ---
@@ -174,8 +182,8 @@ $resRecurring = $conn->query("SELECT issue_type, location, COUNT(*) as count FRO
             <?php endforeach; ?>
         </nav>
         <div class="p-4 border-t border-slate-100">
-            <a href="index.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
-                <i data-lucide="log-out" class="w-5 h-5"></i> กลับหน้าแรก
+            <a href="logout.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
+                <i data-lucide="log-out" class="w-5 h-5"></i> ออกจากระบบ
             </a>
         </div>
     </div>

@@ -1,6 +1,10 @@
 <?php
-require_once 'auth_check.php';
+session_start();
 require_once 'db.php';
+if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
+    header("Location: admin_login.php");
+    exit();
+}
 $current_page = 'tickets';
 
 // ฟังก์ชันจำแนกสีป้ายสถานะ 5 ระดับ

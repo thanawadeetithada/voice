@@ -1,8 +1,10 @@
 <?php
-require_once 'auth_check.php'; // ป้องกันคนนอกเข้าถึง
+session_start();
 require_once 'db.php';
-
-// รับค่าฟิลเตอร์
+if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
+    header("Location: admin_login.php");
+    exit();
+}// รับค่าฟิลเตอร์
 $selected_year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 $selected_quarter = isset($_GET['quarter']) ? $_GET['quarter'] : 'all';
 
