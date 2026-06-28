@@ -8,7 +8,6 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
 $current_page = 'settings';
 $error_msg = '';
 
-// ตรวจสอบว่ามี ID ส่งมาใน URL หรือไม่
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: admin_settings.php");
     exit;
@@ -16,20 +15,17 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
 $target_id = intval($_GET['id']);
 
-// บันทึกการแก้ไขข้อมูลเมื่อมีการยืนยันส่งฟอร์มเข้ามา
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     $new_username = trim($_POST['username']);
     $new_role = $_POST['userrole'];
     $new_password = $_POST['password']; 
-    $confirm_password = $_POST['confirm_password'] ?? ''; // รับค่ายืนยันรหัสผ่าน
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
     if (empty($new_username)) {
         $error_msg = "กรุณากรอก Username";
     } elseif (!empty($new_password) && $new_password !== $confirm_password) {
-        // ตรวจสอบความถูกต้องของรหัสผ่านฝั่ง Server
         $error_msg = "รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน";
     } else {
-        // เช็คว่า Username ซ้ำกับคนอื่นในระบบหรือไม่ (ยกเว้นตัวเอง)
         $checkStmt = $conn->prepare("SELECT id FROM admins WHERE username = ? AND id != ?");
         $checkStmt->bind_param("si", $new_username, $target_id);
         $checkStmt->execute();
@@ -38,29 +34,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
         if ($checkStmt->num_rows > 0) {
             $error_msg = "Username นี้มีผู้ใช้งานอื่นใช้ไปแล้ว กรุณาตั้งชื่ออื่น";
         } else {
-            // ถ้าระบุรหัสผ่านใหม่เข้ามา ให้ทำแฮช (Hash) ใหม่
             if (!empty($new_password)) {
                 $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
                 $updateStmt = $conn->prepare("UPDATE admins SET username = ?, password = ?, userrole = ? WHERE id = ?");
                 $updateStmt->bind_param("sssi", $new_username, $hashed_password, $new_role, $target_id);
             } else {
-                // ถ้าปล่อยช่องรหัสผ่านว่างไว้ ให้อัปเดตเฉพาะชื่อและสิทธิ์
                 $updateStmt = $conn->prepare("UPDATE admins SET username = ?, userrole = ? WHERE id = ?");
                 $updateStmt->bind_param("ssi", $new_username, $new_role, $target_id);
             }
 
             if ($updateStmt->execute()) {
-                
-                // ==========================================
-                // เพิ่มโค้ดส่วนนี้: อัปเดต Session ทันทีหากเป็นการแก้ไขข้อมูลของตัวเอง
-                // ==========================================
                 if (isset($_SESSION['admin_id']) && $target_id == $_SESSION['admin_id']) {
                     $_SESSION['admin_username'] = $new_username;
-                    $_SESSION['admin_role']     = $new_role; // อัปเดต Role เผื่อมีการเปลี่ยนสิทธิ์ตัวเองด้วย
+                    $_SESSION['admin_role']     = $new_role;
                 }
-                // ==========================================
 
-                // อัปเดตสำเร็จให้กลับไปหน้าตาราง setting ทันที
                 header("Location: admin_settings.php");
                 exit;
             } else {
@@ -70,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     }
 }
 
-// ดึงข้อมูลปัจจุบันมาแสดงในฟอร์ม
 $stmt = $conn->prepare("SELECT id, username, userrole FROM admins WHERE id = ?");
 $stmt->bind_param("i", $target_id);
 $stmt->execute();
@@ -263,7 +250,6 @@ if (!$user_data) {
     <script>
     lucide.createIcons();
 
-    // ฟังก์ชันเปิด/ปิด ตารหัสผ่าน
     function togglePassword(inputId, btnId) {
         const input = document.getElementById(inputId);
         const btn = document.getElementById(btnId);

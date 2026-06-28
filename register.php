@@ -11,8 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
     
-    $submittedUsername = $username; // เก็บค่า username ไว้เพื่อนำไปแสดงกลับใน form กรณีเกิดข้อผิดพลาด
-
+    $submittedUsername = $username;
     if (empty($username) || empty($password)) {
         $modalMessage = 'กรุณากรอกข้อมูลให้ครบถ้วน';
         $modalType = 'error';
@@ -20,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $modalMessage = 'รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน';
         $modalType = 'error';
     } else {
-        // เช็คว่ามี username นี้ในระบบหรือยัง
         $stmt_check = $conn->prepare("SELECT id FROM admins WHERE username = ?");
         $stmt_check->bind_param("s", $username);
         $stmt_check->execute();
@@ -30,9 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $modalMessage = 'ชื่อผู้ใช้งานนี้มีในระบบแล้ว กรุณาใช้ชื่ออื่น';
             $modalType = 'error';
         } else {
-            // สมัครสมาชิก
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $role = 'user'; // ตั้งค่าเริ่มต้นเป็น user
+            $role = 'user';
 
             $stmt_insert = $conn->prepare("INSERT INTO admins (username, password, userrole) VALUES (?, ?, ?)");
             $stmt_insert->bind_param("sss", $username, $hashed_password, $role);
@@ -40,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($stmt_insert->execute()) {
                 $modalMessage = 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
                 $modalType = 'success';
-                $submittedUsername = ''; // เคลียร์ username หลังสมัครสำเร็จ
+                $submittedUsername = '';
             } else {
                 $modalMessage = 'เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง';
                 $modalType = 'error';
@@ -183,27 +180,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             
-            // หากสำเร็จ ให้ redirect ไปหน้าล็อกอินหลังจากปิด modal
             if(isSuccess) {
                 window.location.href = 'admin_login.php';
             }
         }, 300);
     }
 
-    // ตรวจสอบความถูกต้องของรหัสผ่านฝั่ง Client
     function validateForm(e) {
         const pass = document.getElementById('password').value;
         const confirm = document.getElementById('confirm_password').value;
         
         if(pass !== confirm && pass !== '' && confirm !== '') {
-            e.preventDefault(); // ยกเลิกการ submit
+            e.preventDefault();
             showAlert("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน", "error");
             return false;
         }
         return true;
     }
 
-    // เรียกใช้ Modal หากมีข้อความจาก PHP
     <?php if(!empty($modalMessage)): ?>
         showAlert("<?php echo addslashes($modalMessage); ?>", "<?php echo $modalType; ?>");
     <?php endif; ?>

@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'] ?? '';
     $submittedUsername = $username;
 
-    // ดึงข้อมูลจากฐานข้อมูลโดยใช้ mysqli
     $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -19,12 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin = $result->fetch_assoc();
 
     if ($admin && password_verify($password, $admin['password'])) {
-        // เช็ค Role
         if ($admin['userrole'] === 'user') {
             $modalMessage = 'กรุณาติดต่อแอดมิน';
             $modalType = 'warning';
         } else {
-            // ล็อกอินสำเร็จ เก็บค่าลง Session (เฉพาะคนที่เป็น admin)
             $_SESSION['admin_logged_in'] = true;
             $_SESSION['admin_id'] = $admin['id'];
             $_SESSION['admin_username'] = $admin['username'];
@@ -157,7 +154,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }, 300);
     }
 
-    // เรียกใช้ Modal หากมีข้อความจาก PHP
     <?php if(!empty($modalMessage)): ?>
         showAlert("<?php echo addslashes($modalMessage); ?>", "<?php echo $modalType; ?>");
     <?php endif; ?>

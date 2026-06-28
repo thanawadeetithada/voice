@@ -7,11 +7,9 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
 }
 $current_page = 'settings';
 
-// จัดการการลบข้อมูล (เมื่อมีการกดปุ่ม "ลบข้อมูล" จาก Modal)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_admin'])) {
     $delete_id = intval($_POST['delete_id']);
     
-    // ป้องกันไม่ให้แอดมินลบบัญชีที่ตัวเองกำลังล็อกอินอยู่
     if (isset($_SESSION['admin_id']) && $delete_id == $_SESSION['admin_id']) {
         echo "<script>alert('ไม่สามารถลบบัญชีของตัวเองได้'); window.location='admin_settings.php';</script>";
         exit;
@@ -118,7 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_admin'])) {
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 <?php
-                                // ดึงข้อมูลผู้ใช้ทุกคน ไม่จำกัด Role
                                 $sql = "SELECT id, username, userrole FROM admins ORDER BY id ASC";
                                 $result = $conn->query($sql);
                                 if($result->num_rows > 0):

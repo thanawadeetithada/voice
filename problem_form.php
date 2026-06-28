@@ -344,7 +344,7 @@
         const details = document.getElementById('details').value.trim();
         const location = document.getElementById('location').value; // เพิ่มการดึงค่าสถานที่
         const impactsChecked = document.querySelectorAll('input[name="impacts[]"]:checked')
-            .length; // นับจำนวนผลกระทบที่ถูกติ๊กเลือก
+            .length;
 
         if (issueType === "") {
             showAlert("กรุณาเลือกประเภทเรื่องก่อนส่งข้อมูลครับ", "issue_type");

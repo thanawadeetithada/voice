@@ -4,11 +4,10 @@ require_once 'db.php';
 if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
     header("Location: admin_login.php");
     exit();
-}// รับค่าฟิลเตอร์
+}
 $selected_year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 $selected_quarter = isset($_GET['quarter']) ? $_GET['quarter'] : 'all';
 
-// สร้างเงื่อนไข Query
 $whereClause = "WHERE YEAR(created_at) = $selected_year";
 $filename_suffix = "Y" . $selected_year;
 
@@ -20,22 +19,17 @@ if ($selected_quarter !== 'all') {
     $filename_suffix .= "_All";
 }
 
-// ตั้งชื่อไฟล์ที่จะให้ดาวน์โหลด
 $filename = "VOC_Report_" . $filename_suffix . "_" . date('Ymd_His') . ".csv";
 
-// กำหนด Header เพื่อบังคับดาวน์โหลดเป็นไฟล์ CSV
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-// เปิด Output Stream
 $output = fopen('php://output', 'w');
 
-// แทรก BOM (Byte Order Mark) เพื่อให้ Excel อ่านภาษาไทย (UTF-8) ได้ถูกต้อง
 fputs($output, "\xEF\xBB\xBF");
 
-// กำหนดหัวคอลัมน์ (Headers) ของไฟล์ CSV
 $headers = [
     'Ticket ID',
     'หมวดหมู่แบบฟอร์ม',
@@ -56,13 +50,11 @@ $headers = [
 ];
 fputcsv($output, $headers);
 
-// ดึงข้อมูลจากฐานข้อมูล
 $sql = "SELECT * FROM tickets $whereClause ORDER BY created_at DESC";
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        // จัดเตรียมข้อมูลแต่ละแถวให้ตรงกับหัวคอลัมน์
         $lineData = [
             $row['ticket_id'],
             $row['form_category'],
@@ -81,12 +73,10 @@ if ($result && $result->num_rows > 0) {
             date('d/m/Y H:i', strtotime($row['created_at'])),
             !empty($row['closed_at']) ? date('d/m/Y H:i', strtotime($row['closed_at'])) : '-'
         ];
-        // เขียนข้อมูลลงไฟล์ CSV
         fputcsv($output, $lineData);
     }
 }
 
-// ปิด Output Stream
 fclose($output);
 exit();
 ?>

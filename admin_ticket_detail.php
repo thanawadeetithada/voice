@@ -7,7 +7,6 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
 }
 $current_page = 'tickets';
 
-// ฟังก์ชันจำแนกสีป้ายสถานะ 5 ระดับ
 function getStatusColor($status) {
     switch ($status) {
         case 'ปิดเรื่อง':            return 'bg-emerald-100 text-emerald-800 border-emerald-300';
@@ -19,9 +18,6 @@ function getStatusColor($status) {
     }
 }
 
-// =====================================================================
-// ส่วนที่ 1: บันทึกการอัปเดตข้อมูลจากแอดมิน (POST Request)
-// =====================================================================
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_ticket'])) {
     $ticket_id_to_update = intval($_POST['ticket_id']);
     $new_status          = $_POST['status'];
@@ -31,11 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_ticket'])) {
     $new_feedback        = trim($_POST['feedback']);
     $admin_id            = $_SESSION['admin_id'] ?? 0;
 
-    // ดึงเวลาเก่ามาตรวจสอบว่าช่องไหนยังเป็น NULL อยู่บ้าง (ป้องกันการประทับเวลาทับของเดิมเมื่อกดบันทึกซ้ำ)
     $q = $conn->query("SELECT admin_received, review_at, in_progress_at, resolved_at, closed_at FROM tickets WHERE id = $ticket_id_to_update");
     $old = $q->fetch_assoc();
 
-    // ตรรกะน้ำตก (Waterfall Auto-fill): จะประทับเวลาและ ID ก็ต่อเมื่อช่องนั้นยังว่างอยู่
     $s_rec  = empty($old['admin_received']) ? ", admin_received = '$admin_id'"                             : "";
     $s_rev  = empty($old['review_at'])      ? ", admin_review = '$admin_id', review_at = NOW()"           : "";
     $s_prog = empty($old['in_progress_at']) ? ", admin_in_progress = '$admin_id', in_progress_at = NOW()" : "";
@@ -63,16 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_ticket'])) {
     exit;
 }
 
-// =====================================================================
-// ส่วนที่ 2: ดึงข้อมูล Ticket มาแสดงผล (GET Request)
-// =====================================================================
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $stmt = $conn->prepare("SELECT * FROM tickets WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $ticket = $stmt->get_result()->fetch_assoc();
 
-// [Silent Touch]: ถ้าตั๋วนี้ยังไม่เคยมีใครเปิดอ่าน (admin_received เป็น NULL) ให้แสตมป์ ID แอดมินคนนี้ทันที!
+
 if ($ticket && empty($ticket['admin_received']) && isset($_SESSION['admin_id'])) {
     $aid = intval($_SESSION['admin_id']);
     $conn->query("UPDATE tickets SET admin_received = $aid WHERE id = $id");

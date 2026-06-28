@@ -7,7 +7,6 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
 }
 $current_page = 'tickets';
 
-// 1. ฟังก์ชันจำแนกสีสถานะ 5 ระดับ (ให้ตรงกับหลังบ้าน)
 function getStatusColor($status) {
     switch ($status) {
         case 'ปิดเรื่อง':            return 'bg-emerald-100 text-emerald-800 border-emerald-300';
@@ -19,7 +18,6 @@ function getStatusColor($status) {
     }
 }
 
-// 2. ฟังก์ชันจำแนกป้ายเตือนระดับความเร่งด่วน (Urgency Badge)
 function getUrgencyBadge($urgency) {
     switch ($urgency) {
         case 'Critical': return '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-extrabold bg-red-100 text-red-700 border border-red-300 animate-pulse shadow-sm">🔴 ด่วนที่สุด</span>';
@@ -30,7 +28,6 @@ function getUrgencyBadge($urgency) {
     }
 }
 
-// จัดการการลบข้อมูล (เมื่อมีการกดยืนยันจาก Modal)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_ticket'])) {
     $delete_id = intval($_POST['delete_id']);
     

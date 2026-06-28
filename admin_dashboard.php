@@ -7,24 +7,19 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
 }
 $current_page = 'dashboard';
 
-// --- จัดการตัวกรอง (Filter) ปีและไตรมาส ---
 $selected_year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 
-// เช็คว่าค่า quarter ที่ส่งมาเป็น 'all' หรือไม่
 if (isset($_GET['quarter']) && $_GET['quarter'] === 'all') {
     $selected_quarter = 'all';
 } else {
-    // ถ้าไม่ใช่ 'all' (เป็นตัวเลข) ถึงจะครอบด้วย intval() ถ้าไม่มีค่าให้ใช้ไตรมาสปัจจุบัน
     $selected_quarter = isset($_GET['quarter']) ? intval($_GET['quarter']) : ceil(date('n') / 3);
 }
 
-// สร้างเงื่อนไข Query
 $whereClause = "WHERE YEAR(created_at) = $selected_year";
 if ($selected_quarter !== 'all') {
     $whereClause .= " AND QUARTER(created_at) = $selected_quarter";
 }
 
-// --- 1. ดึงข้อมูลตั๋วทั้งหมดในไตรมาสที่เลือกเพื่อนำมาประมวลผล ---
 $sqlAll = "SELECT * FROM tickets $whereClause";
 $resultAll = $conn->query($sqlAll);
 
@@ -35,11 +30,10 @@ while($row = $resultAll->fetch_assoc()) {
 
 $totalTickets = count($tickets);
 
-// ตัวแปรสำหรับเก็บสถิติต่างๆ
 $closedTickets = 0;
 $suggestionsCount = 0;
 $complimentsCount = 0;
-$problemCount = 0; // เปลี่ยนมาใช้นับการแจ้งปัญหาแทน
+$problemCount = 0; 
 $responseTimes = [];
 $slaMetCount = 0;
 $slaTotalApplicable = 0;
@@ -48,25 +42,20 @@ $categoryCount = [];
 $locationCount = [];
 
 foreach ($tickets as $t) {
-    // แยกตามหมวดหมู่
     $cat = $t['form_category'];
     $categoryCount[$cat] = ($categoryCount[$cat] ?? 0) + 1;
     
-    // แยกตามสถานที่
     $loc = $t['location'];
     $locationCount[$loc] = ($locationCount[$loc] ?? 0) + 1;
 
-    // นับแยกตามประเภทแบบฟอร์ม (form_category)
     if ($cat == 'ข้อเสนอแนะเพื่อพัฒนา') $suggestionsCount++;
     if ($cat == 'ชื่นชมบุคลากร/หน่วยงาน') $complimentsCount++;
     if ($cat == 'แจ้งปัญหา') $problemCount++;
 
-    // การปิดเรื่อง
     if ($t['status'] == 'ปิดเรื่อง') {
         $closedTickets++;
     }
 
-    // Response Time (หาเวลาที่แอดมินเริ่มตอบสนองแรกสุด)
     $created = strtotime($t['created_at']);
     $first_response = null;
     if (!empty($t['review_at'])) $first_response = strtotime($t['review_at']);
@@ -77,14 +66,13 @@ foreach ($tickets as $t) {
         $responseTimes[] = $diff_hours;
     }
 
-    // SLA Calculation
     if (!empty($t['urgency']) && $t['urgency'] != 'Low') {
         $slaTotalApplicable++;
         if (!empty($t['resolved_at']) || !empty($t['closed_at'])) {
             $end_time = !empty($t['resolved_at']) ? strtotime($t['resolved_at']) : strtotime($t['closed_at']);
             $process_hours = ($end_time - $created) / 3600;
             
-            $sla_limit = 72; // Default Medium
+            $sla_limit = 72;
             if ($t['urgency'] == 'Critical') $sla_limit = 4;
             if ($t['urgency'] == 'High') $sla_limit = 24;
             
@@ -95,7 +83,6 @@ foreach ($tickets as $t) {
     }
 }
 
-// คำนวณเปอร์เซ็นต์
 $resolutionPercent = $totalTickets > 0 ? round(($closedTickets / $totalTickets) * 100) : 0;
 $slaPercent = $slaTotalApplicable > 0 ? round(($slaMetCount / $slaTotalApplicable) * 100) : 0;
 
@@ -104,7 +91,6 @@ if (count($responseTimes) > 0) {
     sort($responseTimes);
     $count = count($responseTimes);
     
-    // แก้ไข: เพิ่ม (int) เพื่อแปลงผลลัพธ์เป็นจำนวนเต็ม ป้องกัน Error จาก Intelephense
     $mid = (int) floor($count / 2); 
     
     if ($count % 2 == 0) {
@@ -113,7 +99,6 @@ if (count($responseTimes) > 0) {
         $median = $responseTimes[$mid];
     }
     
-    // แปลงผลลัพธ์ให้อ่านง่าย
     if ($median < 1) {
         $medianResponseTime = round($median * 60) . " นาที";
     } else {
@@ -121,7 +106,6 @@ if (count($responseTimes) > 0) {
     }
 }
 
-// --- 2. Top 10 Pain Points ---
 $resTopPains = $conn->query("SELECT issue_type, COUNT(*) as count FROM tickets $whereClause GROUP BY issue_type ORDER BY count DESC LIMIT 10");
 $topPains = [];
 $colors = ['bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-fuchsia-500'];
@@ -139,7 +123,6 @@ if($resTopPains && $resTopPains->num_rows > 0) {
     }
 }
 
-// --- 3. Recurring Issues (ปัญหาซ้ำซากในพื้นที่เดิม) ---
 $resRecurring = $conn->query("SELECT issue_type, location, COUNT(*) as count FROM tickets $whereClause GROUP BY issue_type, location HAVING count > 1 ORDER BY count DESC LIMIT 5");
 
 ?>
@@ -309,7 +292,7 @@ $resRecurring = $conn->query("SELECT issue_type, location, COUNT(*) as count FRO
                             <h3 class="text-base font-bold text-slate-800 mb-4 sticky top-0 bg-white pb-2 border-b border-slate-100">แยกตามหน่วยงาน (Location)</h3>
                             <ul class="space-y-3">
                                 <?php 
-                                arsort($locationCount); // เรียงจากมากไปน้อย
+                                arsort($locationCount);
                                 if(!empty($locationCount)): 
                                     foreach($locationCount as $loc => $count): 
                                 ?>
