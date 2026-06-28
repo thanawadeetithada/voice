@@ -40,7 +40,7 @@ $view = isset($_GET['view']) ? $_GET['view'] : 'dash';
             <?php endforeach; ?>
         </nav>
         <div class="p-4 border-t border-slate-100">
-            <a href="admin-login.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
+            <a href="logout.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
                 <i data-lucide="log-out" class="w-5 h-5"></i> ออกจากระบบ
             </a>
         </div>

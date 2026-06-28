@@ -1,12 +1,12 @@
 <?php
-$current_page = 'settings';
+$current_page = 'reports';
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - VOICESRI</title>
+    <title>Reports - VOICESRI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -44,7 +44,7 @@ $current_page = 'settings';
             <?php endforeach; ?>
         </nav>
         <div class="p-4 border-t border-slate-100">
-            <a href="admin-login.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
+            <a href="logout.php" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-red-500 transition-colors bg-slate-50 rounded-xl">
                 <i data-lucide="log-out" class="w-5 h-5"></i> ออกจากระบบ
             </a>
         </div>
@@ -77,9 +77,9 @@ $current_page = 'settings';
 
         <main class="flex-1 overflow-y-auto p-4 md:p-6 pb-20">
             <div class="space-y-6">
-                <h1 class="text-2xl font-bold text-slate-800">Settings</h1>
+                <h1 class="text-2xl font-bold text-slate-800">Reports</h1>
                 <div class="bg-white p-8 rounded-2xl border border-slate-200 text-center">
-                    <p class="text-slate-500">Settings</p>
+                    <p class="text-slate-500">Reports</p>
                 </div>
             </div>
         </main>

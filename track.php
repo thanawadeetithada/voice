@@ -1,4 +1,16 @@
-<?php $id = isset($_GET['id']) ? $_GET['id'] : 'VOC-2026-0001'; ?>
+<?php 
+require_once 'db.php';
+$id = isset($_GET['id']) ? $_GET['id'] : '';
+$ticket = null;
+
+if($id) {
+    $stmt = $conn->prepare("SELECT * FROM tickets WHERE ticket_id = ?");
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $ticket = $result->fetch_assoc();
+}
+?>
 <!DOCTYPE html>
 <html lang="th">
 
@@ -26,7 +38,7 @@
                 <h1 class="text-2xl font-bold tracking-tight cursor-pointer" onclick="window.location.href='index.php'">
                     VOICESRI
                 </h1>
-                <span class="hidden lg:inline-block text-emerald-200 font-medium border-l border-emerald-500/50 pl-4 ml-2">ติดตามสถานะการดำเนินการ</span>
+                <span class="text-emerald-200 font-medium border-emerald-500/50">ติดตามสถานะการดำเนินการ</span>
             </div>
             <button class="hidden">
                 <i class="fa-solid fa-xmark text-xl"></i>
@@ -35,59 +47,78 @@
     </header>
 
     <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 lg:py-12 flex justify-center">
-        
-        <div class="w-full lg:max-w-4xl lg:bg-white lg:p-10 lg:rounded-3xl lg:shadow-sm lg:border lg:border-emerald-100 flex flex-col">
+        <div class="w-full lg:max-w-4xl lg:p-10 flex flex-col">
             
-            <div class="mb-8 lg:mb-10 flex justify-between items-end border-b border-emerald-100 pb-5">
+            <?php if($ticket): ?>
+            
+            <div class="mb-8 lg:mb-10 flex justify-between items-center border-b border-emerald-100 pb-5 gap-4">
                 <div>
                     <h2 class="text-xl lg:text-3xl font-bold text-emerald-900">สถานะการดำเนินการ</h2>
-                    <p class="text-sm lg:text-base text-slate-500 font-mono mt-2">Ticket ID: <span class="font-bold text-emerald-700"><?php echo htmlspecialchars($id); ?></span></p>
+                    <p class="text-sm lg:text-base text-slate-500 font-mono mt-2">Ticket ID: <span class="font-bold text-emerald-700"><?php echo htmlspecialchars($ticket['ticket_id']); ?></span></p>
+                    <p class="text-sm mt-1 text-slate-600">เรื่อง: <span class="font-medium text-slate-800"><?php echo htmlspecialchars($ticket['form_category']); ?></span> (<?php echo htmlspecialchars($ticket['location']); ?>)</p>
                 </div>
-                <div class="w-12 h-12 lg:w-16 lg:h-16 hidden lg:block">
-                    <img src="img/logo.png" alt="Mascot" class="w-full object-cover" onerror="this.style.display='none'">
+                <div class="w-16 h-16 lg:w-20 lg:h-20 lg:flex items-center justify-center shrink-0">
+                    <img src="img/logo.png" alt="Mascot" class="w-full h-full object-contain" onerror="this.style.display='none'">
                 </div>
             </div>
 
-            <div class="relative pl-6 lg:pl-8 border-l-2 border-emerald-100 space-y-8 lg:space-y-12 mb-4 ml-2 lg:ml-4">
+            <div class="relative mb-4 ml-2 lg:ml-4">
                 
-                <div class="relative">
-                    <div class="absolute -left-[35px] lg:-left-[43px] bg-emerald-600 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center">
-                        <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
-                    </div>
-                    <p class="text-sm lg:text-lg font-bold text-slate-800">รับเรื่องแล้ว</p>
-                    <p class="text-xs lg:text-sm text-slate-500 mt-1">27 มิ.ย. 2026, 09:30 น.</p>
-                </div>
+                <div class="absolute left-[11px] lg:left-[15px] top-2 bottom-2 w-[2px] bg-emerald-100 z-0"></div>
 
-                <div class="relative">
-                    <div class="absolute -left-[35px] lg:-left-[43px] bg-emerald-600 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center">
-                        <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
-                    </div>
-                    <p class="text-sm lg:text-lg font-bold text-slate-800">อยู่ระหว่างพิจารณา</p>
-                    <p class="text-xs lg:text-sm text-slate-500 mt-1">27 มิ.ย. 2026, 10:15 น.</p>
-                </div>
-
-                <div class="relative">
-                    <div class="absolute -left-[35px] lg:-left-[43px] bg-orange-400 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white animate-pulse shadow-md shadow-orange-200"></div>
-                    <p class="text-sm lg:text-lg font-bold text-orange-600">อยู่ระหว่างดำเนินการ</p>
-                    <p class="text-xs lg:text-sm text-slate-500 mt-1">คาดว่าจะแล้วเสร็จภายใน 3 วัน</p>
+                <div class="space-y-8 lg:space-y-12">
                     
-                    <div class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl lg:rounded-2xl p-4 lg:p-5 relative shadow-sm max-w-2xl">
-                        <div class="absolute -top-2 left-6 w-4 h-4 bg-emerald-50 rotate-45 border-l border-t border-emerald-200"></div>
-                        <p class="text-xs lg:text-sm font-bold text-emerald-800 mb-2 flex items-center gap-1.5">
-                            <i data-lucide="shield-check" class="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600"></i> ข้อความตอบกลับจากหน่วยงาน:
-                        </p>
-                        <p class="text-sm lg:text-base text-slate-700 leading-relaxed">
-                            "รับทราบปัญหาเรื่องแอร์ห้องพักญาติไม่เย็นครับ ตอนนี้ได้แจ้งช่างซ่อมบำรุงเข้าตรวจสอบแล้ว เบื้องต้นพบน้ำยาแอร์ขาด กำลังเติมน้ำยาครับ"
-                        </p>
+                    <div class="relative z-10 flex items-start gap-4 lg:gap-5">
+                        <div class="w-6 h-6 lg:w-8 lg:h-8 rounded-full bg-emerald-600 border-4 border-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                            <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
+                        </div>
+                        <div class="pt-0.5 lg:pt-1">
+                            <p class="text-sm lg:text-lg font-bold text-slate-800">รับเรื่องแล้ว</p>
+                            <p class="text-xs lg:text-sm text-slate-500 mt-1"><?php echo date('d M Y, H:i น.', strtotime($ticket['created_at'])); ?></p>
+                        </div>
                     </div>
-                </div>
 
-                <div class="relative opacity-40">
-                    <div class="absolute -left-[35px] lg:-left-[43px] bg-slate-300 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white"></div>
-                    <p class="text-sm lg:text-lg font-bold text-slate-500">ดำเนินการแล้ว / ปิดเรื่อง</p>
-                </div>
+                    <?php if($ticket['status'] != 'รับเรื่องแล้ว'): ?>
+                    <div class="relative z-10 flex items-start gap-4 lg:gap-5">
+                        <div class="<?php echo ($ticket['status'] == 'ปิดเรื่อง') ? 'bg-emerald-600' : 'bg-orange-400 animate-pulse shadow-md shadow-orange-200'; ?> w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center shrink-0 mt-0.5">
+                            <?php if($ticket['status'] == 'ปิดเรื่อง'): ?>
+                                <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="pt-0.5 lg:pt-1 w-full max-w-2xl">
+                            <p class="text-sm lg:text-lg font-bold <?php echo ($ticket['status'] == 'ปิดเรื่อง') ? 'text-emerald-600' : 'text-orange-600'; ?>">
+                                <?php echo htmlspecialchars($ticket['status']); ?>
+                            </p>
+                            <p class="text-xs lg:text-sm text-slate-500 mt-1">อัปเดตล่าสุดเมื่อ: <?php echo date('d M Y, H:i น.', strtotime($ticket['updated_at'])); ?></p>
+                            
+                            <?php if(!empty($ticket['feedback'])): ?>
+                            <div class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl lg:rounded-2xl p-4 lg:p-5 relative shadow-sm w-full">
+                                <div class="absolute -top-2 left-6 w-4 h-4 bg-emerald-50 rotate-45 border-l border-t border-emerald-200"></div>
+                                <p class="text-xs lg:text-sm font-bold text-emerald-800 mb-2 flex items-center gap-1.5">
+                                    <i data-lucide="shield-check" class="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600"></i> ข้อความตอบกลับจากหน่วยงาน:
+                                </p>
+                                <p class="text-sm lg:text-base text-slate-700 leading-relaxed">
+                                    "<?php echo nl2br(htmlspecialchars($ticket['feedback'])); ?>"
+                                </p>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
+                </div>
             </div>
+            
+            <?php else: ?>
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="search-x" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-xl lg:text-2xl font-bold text-slate-800">ไม่พบข้อมูล Ticket ID นี้</h2>
+                    <p class="text-slate-500 mt-2">โปรดตรวจสอบหมายเลขอีกครั้ง หรือลองค้นหาใหม่ในหน้าแรกครับ</p>
+                    <button onclick="window.location.href='home.php'" class="mt-6 bg-slate-100 text-slate-600 px-6 py-2 rounded-xl font-medium hover:bg-slate-200">กลับหน้าแรก</button>
+                </div>
+            <?php endif; ?>
 
         </div>
     </main>

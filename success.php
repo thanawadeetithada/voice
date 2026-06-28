@@ -33,14 +33,14 @@
 
     <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 lg:py-12 flex items-center justify-center">
         
-        <div class="w-full lg:max-w-2xl lg:bg-white lg:p-12 lg:rounded-3xl lg:shadow-sm lg:border lg:border-emerald-100 flex flex-col items-center text-center">
+        <div class="w-full lg:max-w-2xl  lg:p-12 flex flex-col items-center text-center">
             
             <div class="mb-6 relative">
                 <div class="absolute inset-0 bg-orange-100 rounded-full blur-2xl opacity-50"></div>
-                <img src="https://placehold.co/400x400/2f7c47/fff?text=Mascot+Happy" class="w-28 h-28 lg:w-36 lg:h-36 object-cover relative z-10 mx-auto rounded-full border-4 border-white shadow-lg" alt="Success">
+                <img src="img/logo.png" class="w-28 h-28 lg:w-36 lg:h-36 object-contain relative z-10 mx-auto" alt="Success" onerror="this.src='https://placehold.co/400x400/2f7c47/fff?text=Mascot+Happy'">
             </div>
 
-            <h2 class="text-2xl lg:text-3xl font-bold text-emerald-800 mb-2">ขอบคุณค่ะ</h2>
+            <h2 class="text-2xl lg:text-3xl font-bold text-emerald-800 mb-2">ขอบคุณครับ</h2>
             <p class="text-slate-600 text-sm lg:text-base mb-8">ที่ร่วมเป็นส่วนหนึ่งในการพัฒนาองค์กรของเรา</p>
             
             <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 lg:p-8 w-full mb-8 shadow-inner">
@@ -53,7 +53,7 @@
                 <button onclick="window.location.href='index.php'" class="flex-1 py-3.5 lg:py-4 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl lg:rounded-2xl hover:bg-slate-200 transition-colors order-2 lg:order-1">
                     กลับหน้าหลัก
                 </button>
-                <button onclick="window.location.href='track.php?id=<?php echo $id; ?>'" class="flex-1 py-3.5 lg:py-4 px-4 bg-orange-500 text-white font-bold rounded-xl lg:rounded-2xl hover:bg-orange-600 shadow-md shadow-orange-200 transition-colors order-1 lg:order-2">
+                <button onclick="window.location.href='track.php?id=<?php echo htmlspecialchars($id); ?>'" class="flex-1 py-3.5 lg:py-4 px-4 bg-orange-500 text-white font-bold rounded-xl lg:rounded-2xl hover:bg-orange-600 shadow-md shadow-orange-200 transition-colors order-1 lg:order-2">
                     ดูสถานะตอนนี้เลย
                 </button>
             </div>
