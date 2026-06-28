@@ -31,7 +31,7 @@ $totalTickets = count($tickets);
 $closedTickets = 0;
 $suggestionsCount = 0;
 $complimentsCount = 0;
-$actualImprovements = 0;
+$problemCount = 0; // เปลี่ยนมาใช้นับการแจ้งปัญหาแทน
 $responseTimes = [];
 $slaMetCount = 0;
 $slaTotalApplicable = 0;
@@ -48,16 +48,14 @@ foreach ($tickets as $t) {
     $loc = $t['location'];
     $locationCount[$loc] = ($locationCount[$loc] ?? 0) + 1;
 
-    // Engagement
+    // นับแยกตามประเภทแบบฟอร์ม (form_category)
     if ($cat == 'ข้อเสนอแนะเพื่อพัฒนา') $suggestionsCount++;
     if ($cat == 'ชื่นชมบุคลากร/หน่วยงาน') $complimentsCount++;
+    if ($cat == 'แจ้งปัญหา') $problemCount++;
 
-    // การปิดเรื่องและ Improvement จริง (ปิดเรื่อง + มีบันทึก Action Taken)
+    // การปิดเรื่อง
     if ($t['status'] == 'ปิดเรื่อง') {
         $closedTickets++;
-        if (!empty(trim($t['action_taken']))) {
-            $actualImprovements++;
-        }
     }
 
     // Response Time (หาเวลาที่แอดมินเริ่มตอบสนองแรกสุด)
@@ -193,7 +191,7 @@ $resRecurring = $conn->query("SELECT issue_type, location, COUNT(*) as count FRO
                 <div class="h-8 w-px bg-slate-200 mx-2"></div>
                 <div class="flex items-center gap-3 cursor-pointer">
                     <div class="text-right hidden md:block">
-                        <p class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($_SESSION['admin_username']); ?></p>
+                        <p class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Admin'); ?></p>
                         <p class="text-xs text-emerald-600 font-medium">ผู้ดูแลระบบ</p>
                     </div>
                     <div class="w-10 h-10 bg-emerald-100 border border-emerald-200 rounded-full flex items-center justify-center text-emerald-600">
@@ -226,7 +224,7 @@ $resRecurring = $conn->query("SELECT issue_type, location, COUNT(*) as count FRO
                                 <option value="3" <?php echo $selected_quarter == 3 ? 'selected' : ''; ?>>Q3 (ก.ค. - ก.ย.)</option>
                                 <option value="4" <?php echo $selected_quarter == 4 ? 'selected' : ''; ?>>Q4 (ต.ค. - ธ.ค.)</option>
                             </select>
-                            <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors">
+                            <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors cursor-pointer">
                                 กรองข้อมูล
                             </button>
                         </form>
@@ -271,28 +269,30 @@ $resRecurring = $conn->query("SELECT issue_type, location, COUNT(*) as count FRO
                     
                     <div class="lg:col-span-4 flex flex-col gap-6">
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex-1">
-                            <h3 class="text-base font-bold text-slate-800 mb-5 border-b border-slate-100 pb-3">Engagement & Improvement</h3>
+                            <h3 class="text-base font-bold text-slate-800 mb-5 border-b border-slate-100 pb-3">ประเภทเสียงสะท้อน (VOC Types)</h3>
                             <div class="space-y-4">
-                                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div class="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-100">
                                     <div class="flex items-center gap-3">
-                                        <div class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i data-lucide="lightbulb" class="w-5 h-5"></i></div>
-                                        <span class="text-sm font-bold text-slate-700">ข้อเสนอแนะเพื่อพัฒนา</span>
+                                        <div class="bg-red-200 text-red-700 p-2 rounded-lg"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+                                        <span class="text-sm font-bold text-red-900">แจ้งปัญหา / แจ้งเหตุ</span>
                                     </div>
-                                    <span class="text-lg font-extrabold text-slate-800"><?php echo number_format($suggestionsCount); ?></span>
+                                    <span class="text-lg font-extrabold text-red-700"><?php echo number_format($problemCount); ?></span>
                                 </div>
-                                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                
+                                <div class="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-100">
                                     <div class="flex items-center gap-3">
-                                        <div class="bg-pink-100 text-pink-600 p-2 rounded-lg"><i data-lucide="heart" class="w-5 h-5"></i></div>
-                                        <span class="text-sm font-bold text-slate-700">คำชื่นชม</span>
+                                        <div class="bg-orange-200 text-orange-700 p-2 rounded-lg"><i data-lucide="lightbulb" class="w-5 h-5"></i></div>
+                                        <span class="text-sm font-bold text-orange-900">ข้อเสนอแนะเพื่อพัฒนา</span>
                                     </div>
-                                    <span class="text-lg font-extrabold text-slate-800"><?php echo number_format($complimentsCount); ?></span>
+                                    <span class="text-lg font-extrabold text-orange-700"><?php echo number_format($suggestionsCount); ?></span>
                                 </div>
-                                <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                                
+                                <div class="flex items-center justify-between p-4 bg-pink-50 rounded-xl border border-pink-100">
                                     <div class="flex items-center gap-3">
-                                        <div class="bg-emerald-200 text-emerald-700 p-2 rounded-lg"><i data-lucide="trending-up" class="w-5 h-5"></i></div>
-                                        <span class="text-sm font-bold text-emerald-900">Improvement เกิดขึ้นจริง</span>
+                                        <div class="bg-pink-200 text-pink-700 p-2 rounded-lg"><i data-lucide="heart" class="w-5 h-5"></i></div>
+                                        <span class="text-sm font-bold text-pink-900">คำชื่นชม</span>
                                     </div>
-                                    <span class="text-lg font-extrabold text-emerald-700"><?php echo number_format($actualImprovements); ?></span>
+                                    <span class="text-lg font-extrabold text-pink-700"><?php echo number_format($complimentsCount); ?></span>
                                 </div>
                             </div>
                         </div>

@@ -37,7 +37,7 @@
             
             <div class="mb-6 relative">
                 <div class="absolute inset-0 bg-orange-100 rounded-full blur-2xl opacity-50"></div>
-                <img src="img/logo.png" class="w-28 h-28 lg:w-36 lg:h-36 object-contain relative z-10 mx-auto" alt="Success" onerror="this.src='https://placehold.co/400x400/2f7c47/fff?text=Mascot+Happy'">
+                <img src="img/thanks.png" class="w-28 h-28 lg:w-36 lg:h-36 object-contain relative z-10 mx-auto" alt="Success" onerror="this.src='https://placehold.co/400x400/2f7c47/fff?text=Mascot+Happy'">
             </div>
 
             <h2 class="text-2xl lg:text-3xl font-bold text-emerald-800 mb-2">ขอบคุณครับ</h2>

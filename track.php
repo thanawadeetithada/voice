@@ -67,8 +67,8 @@ if ($current_index === false) $current_index = 0;
                     <p class="text-sm lg:text-base text-slate-500 font-mono mt-2">Ticket ID: <span class="font-bold text-emerald-700"><?php echo htmlspecialchars($ticket['ticket_id']); ?></span></p>
                     <p class="text-sm mt-1 text-slate-600">เรื่อง: <span class="font-medium text-slate-800"><?php echo htmlspecialchars($ticket['form_category']); ?></span> (<?php echo htmlspecialchars($ticket['location']); ?>)</p>
                 </div>
-                <div class="w-16 h-16 lg:w-20 lg:h-20 hidden sm:flex items-center justify-center shrink-0">
-                    <img src="img/logo.png" alt="Mascot" class="w-full h-full object-contain" onerror="this.style.display='none'">
+                <div class="w-16 h-16 lg:w-20 lg:h-20 sm:flex items-center justify-center shrink-0">
+                    <img src="img/track.png" alt="Mascot" class="w-full h-full object-contain" onerror="this.style.display='none'">
                 </div>
             </div>
 
