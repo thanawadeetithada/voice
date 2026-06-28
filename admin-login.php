@@ -8,6 +8,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; }
+        img {
+            width: 25%;
+        }
     </style>
 </head>
 <body class="bg-slate-100 flex items-center justify-center min-h-screen">
@@ -15,7 +18,7 @@
     <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md text-center mx-4">
         <div class="mb-6 relative inline-block">
             <div class="absolute inset-0 bg-emerald-100 rounded-full blur-xl opacity-60"></div>
-            <img src="https://placehold.co/200x200/2f7c47/fff?text=Mascot" class="w-24 h-24 object-cover relative z-10 mx-auto rounded-full border-4 border-white shadow-sm" alt="Admin Mascot">
+            <img src="img/logo.png" class="object-contain relative z-10 mx-auto" alt="Admin Mascot">
         </div>
 
         <h1 class="text-2xl font-bold text-emerald-900 mb-1">VOICESRI Admin</h1>
