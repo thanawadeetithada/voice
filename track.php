@@ -1,6 +1,6 @@
 <?php 
 require_once 'db.php';
-$id = isset($_GET['id']) ? $_GET['id'] : '';
+$id = isset($_GET['id']) ? trim($_GET['id']) : '';
 $ticket = null;
 
 if($id) {
@@ -10,6 +10,19 @@ if($id) {
     $result = $stmt->get_result();
     $ticket = $result->fetch_assoc();
 }
+
+// ลำดับสเต็ปเพื่อใช้เช็คสถานะว่าอันไหน "ผ่านไปแล้ว" หรือ "กำลังทำอยู่"
+$statuses = [
+    'รับเรื่องแล้ว',
+    'อยู่ระหว่างพิจารณา',
+    'อยู่ระหว่างดำเนินการ',
+    'ดำเนินการแล้ว',
+    'ปิดเรื่อง'
+];
+
+$current_status = $ticket ? $ticket['status'] : '';
+$current_index = array_search($current_status, $statuses);
+if ($current_index === false) $current_index = 0;
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -22,17 +35,17 @@ if($id) {
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Sarabun', sans-serif; }
     </style>
 </head>
 
 <body class="bg-white lg:bg-emerald-50/30 text-slate-800 min-h-screen flex flex-col">
 
-    <header class="bg-emerald-700 text-white p-6 lg:px-10 lg:py-5 rounded-b-3xl lg:rounded-none shadow-md sticky top-0 z-50">
+    <header class="bg-emerald-700 text-white p-6 lg:px-10 lg:py-5 rounded-b-3xl lg:rounded-none shadow-md sticky top-0 z-50 shrink-0">
         <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='index.php'" class="flex items-center gap-2 hover:text-emerald-200 transition-colors pr-4 border-r border-emerald-500/50">
+                <button onclick="window.location.href='index.php'" class="flex items-center gap-2 hover:text-emerald-200 transition-colors pr-4 border-r border-emerald-500/50 cursor-pointer">
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
                 <h1 class="text-2xl font-bold tracking-tight cursor-pointer" onclick="window.location.href='index.php'">
@@ -40,9 +53,6 @@ if($id) {
                 </h1>
                 <span class="text-emerald-200 font-medium border-emerald-500/50">ติดตามสถานะการดำเนินการ</span>
             </div>
-            <button class="hidden">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
         </div>
     </header>
 
@@ -57,9 +67,24 @@ if($id) {
                     <p class="text-sm lg:text-base text-slate-500 font-mono mt-2">Ticket ID: <span class="font-bold text-emerald-700"><?php echo htmlspecialchars($ticket['ticket_id']); ?></span></p>
                     <p class="text-sm mt-1 text-slate-600">เรื่อง: <span class="font-medium text-slate-800"><?php echo htmlspecialchars($ticket['form_category']); ?></span> (<?php echo htmlspecialchars($ticket['location']); ?>)</p>
                 </div>
-                <div class="w-16 h-16 lg:w-20 lg:h-20 lg:flex items-center justify-center shrink-0">
+                <div class="w-16 h-16 lg:w-20 lg:h-20 hidden sm:flex items-center justify-center shrink-0">
                     <img src="img/logo.png" alt="Mascot" class="w-full h-full object-contain" onerror="this.style.display='none'">
                 </div>
+            </div>
+
+            <div class="mb-10 bg-slate-50 border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-2 shadow-2xs">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">รายละเอียดปัญหาที่คุณแจ้ง:</p>
+                <p class="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line pl-1 sm:pl-4">
+                    <?php echo htmlspecialchars($ticket['details']); ?>
+                </p>
+                <?php if(!empty($ticket['attachment'])): ?>
+                <div class="pt-3 border-t border-slate-200/60 flex items-center justify-between pl-1 sm:pl-4">
+                    <span class="text-xs text-slate-500">📎 ไฟล์หลักฐานที่แนบไว้</span>
+                    <a href="<?php echo htmlspecialchars($ticket['attachment']); ?>" target="_blank" class="text-xs font-bold text-emerald-600 hover:text-emerald-800 underline inline-flex items-center gap-1">
+                        เปิดดูไฟล์ <i data-lucide="external-link" class="w-3 h-3"></i>
+                    </a>
+                </div>
+                <?php endif; ?>
             </div>
 
             <div class="relative mb-4 ml-2 lg:ml-4">
@@ -78,18 +103,64 @@ if($id) {
                         </div>
                     </div>
 
-                    <?php if($ticket['status'] != 'รับเรื่องแล้ว'): ?>
+                    <?php if(!empty($ticket['review_at'])): ?>
                     <div class="relative z-10 flex items-start gap-4 lg:gap-5">
-                        <div class="<?php echo ($ticket['status'] == 'ปิดเรื่อง') ? 'bg-emerald-600' : 'bg-orange-400 animate-pulse shadow-md shadow-orange-200'; ?> w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center shrink-0 mt-0.5">
-                            <?php if($ticket['status'] == 'ปิดเรื่อง'): ?>
+                        <div class="<?php echo ($current_status == 'อยู่ระหว่างพิจารณา') ? 'bg-orange-400 animate-pulse shadow-md shadow-orange-200' : 'bg-emerald-600'; ?> w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center shrink-0 mt-0.5">
+                            <?php if($current_index >= 1): ?>
                                 <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
                             <?php endif; ?>
                         </div>
-                        <div class="pt-0.5 lg:pt-1 w-full max-w-2xl">
-                            <p class="text-sm lg:text-lg font-bold <?php echo ($ticket['status'] == 'ปิดเรื่อง') ? 'text-emerald-600' : 'text-orange-600'; ?>">
-                                <?php echo htmlspecialchars($ticket['status']); ?>
+                        <div class="pt-0.5 lg:pt-1">
+                            <p class="text-sm lg:text-lg font-bold <?php echo ($current_status == 'อยู่ระหว่างพิจารณา') ? 'text-orange-600' : 'text-slate-800'; ?>">
+                                อยู่ระหว่างพิจารณา
                             </p>
-                            <p class="text-xs lg:text-sm text-slate-500 mt-1">อัปเดตล่าสุดเมื่อ: <?php echo date('d M Y, H:i น.', strtotime($ticket['updated_at'])); ?></p>
+                            <p class="text-xs lg:text-sm text-slate-500 mt-1">อัปเดตเมื่อ: <?php echo date('d M Y, H:i น.', strtotime($ticket['review_at'])); ?></p>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if(!empty($ticket['in_progress_at'])): ?>
+                    <div class="relative z-10 flex items-start gap-4 lg:gap-5">
+                        <div class="<?php echo ($current_status == 'อยู่ระหว่างดำเนินการ') ? 'bg-orange-400 animate-pulse shadow-md shadow-orange-200' : 'bg-emerald-600'; ?> w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center shrink-0 mt-0.5">
+                            <?php if($current_index >= 2): ?>
+                                <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="pt-0.5 lg:pt-1">
+                            <p class="text-sm lg:text-lg font-bold <?php echo ($current_status == 'อยู่ระหว่างดำเนินการ') ? 'text-orange-600' : 'text-slate-800'; ?>">
+                                อยู่ระหว่างดำเนินการ
+                            </p>
+                            <p class="text-xs lg:text-sm text-slate-500 mt-1">อัปเดตเมื่อ: <?php echo date('d M Y, H:i น.', strtotime($ticket['in_progress_at'])); ?></p>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if(!empty($ticket['resolved_at'])): ?>
+                    <div class="relative z-10 flex items-start gap-4 lg:gap-5">
+                        <div class="<?php echo ($current_status == 'ดำเนินการแล้ว') ? 'bg-orange-400 animate-pulse shadow-md shadow-orange-200' : 'bg-emerald-600'; ?> w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center shrink-0 mt-0.5">
+                            <?php if($current_index >= 3): ?>
+                                <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
+                            <?php endif; ?>
+                        </div>
+                        <div class="pt-0.5 lg:pt-1">
+                            <p class="text-sm lg:text-lg font-bold <?php echo ($current_status == 'ดำเนินการแล้ว') ? 'text-orange-600' : 'text-slate-800'; ?>">
+                                ดำเนินการแล้ว
+                            </p>
+                            <p class="text-xs lg:text-sm text-slate-500 mt-1">อัปเดตเมื่อ: <?php echo date('d M Y, H:i น.', strtotime($ticket['resolved_at'])); ?></p>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if($ticket['status'] == 'ปิดเรื่อง' && !empty($ticket['closed_at'])): ?>
+                    <div class="relative z-10 flex items-start gap-4 lg:gap-5">
+                        <div class="bg-emerald-600 w-6 h-6 lg:w-8 lg:h-8 rounded-full border-4 border-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                            <i data-lucide="check" class="text-white w-3 h-3 lg:w-4 lg:h-4"></i>
+                        </div>
+                        <div class="pt-0.5 lg:pt-1 w-full max-w-2xl">
+                            <p class="text-sm lg:text-lg font-bold text-emerald-600">
+                                ปิดเรื่อง
+                            </p>
+                            <p class="text-xs lg:text-sm text-slate-500 mt-1">เสร็จสิ้นเมื่อ: <?php echo date('d M Y, H:i น.', strtotime($ticket['closed_at'])); ?></p>
                             
                             <?php if(!empty($ticket['feedback'])): ?>
                             <div class="mt-4 bg-emerald-50 border border-emerald-200 rounded-xl lg:rounded-2xl p-4 lg:p-5 relative shadow-sm w-full">
@@ -116,7 +187,7 @@ if($id) {
                     </div>
                     <h2 class="text-xl lg:text-2xl font-bold text-slate-800">ไม่พบข้อมูล Ticket ID นี้</h2>
                     <p class="text-slate-500 mt-2">โปรดตรวจสอบหมายเลขอีกครั้ง หรือลองค้นหาใหม่ในหน้าแรกครับ</p>
-                    <button onclick="window.location.href='home.php'" class="mt-6 bg-slate-100 text-slate-600 px-6 py-2 rounded-xl font-medium hover:bg-slate-200">กลับหน้าแรก</button>
+                    <button onclick="window.location.href='home.php'" class="mt-6 bg-slate-100 text-slate-600 px-6 py-2 rounded-xl font-medium hover:bg-slate-200 cursor-pointer">กลับหน้าแรก</button>
                 </div>
             <?php endif; ?>
 

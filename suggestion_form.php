@@ -71,17 +71,23 @@
                             <div>
                                 <label class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">ประเภทเรื่อง
                                     <span class="text-red-500">*</span></label>
-                                <select id="issue_type" name="issue_type" onchange="toggleDetailsRequired()"
-                                    class="w-full p-3 lg:p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500 cursor-pointer">
-                                    <option value="">เลือกประเภทเรื่อง</option>
-                                    <option value="ความปลอดภัย">ความปลอดภัย</option>
-                                    <option value="สิ่งแวดล้อม">สิ่งแวดล้อม</option>
-                                    <option value="เทคโนโลยีสารสนเทศ">เทคโนโลยีสารสนเทศ</option>
-                                    <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
-                                    <option value="การเรียนการสอน">การเรียนการสอน</option>
-                                    <option value="งานวิจัย">งานวิจัย</option>
-                                    <option value="อื่นๆ">อื่น ๆ (โปรดระบุในรายละเอียด)</option>
-                                </select>
+                                <div class="relative">
+                                    <select id="issue_type" name="issue_type" onchange="toggleDetailsRequired()"
+                                        class="w-full p-3 lg:p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500 cursor-pointer appearance-none pr-10">
+                                        <option value="">เลือกประเภทเรื่อง</option>
+                                        <option value="ความปลอดภัย">ความปลอดภัย</option>
+                                        <option value="สิ่งแวดล้อม">สิ่งแวดล้อม</option>
+                                        <option value="เทคโนโลยีสารสนเทศ">เทคโนโลยีสารสนเทศ</option>
+                                        <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
+                                        <option value="การเรียนการสอน">การเรียนการสอน</option>
+                                        <option value="งานวิจัย">งานวิจัย</option>
+                                        <option value="อื่นๆ">อื่น ๆ (โปรดระบุในรายละเอียด)</option>
+                                    </select>
+                                    <div
+                                        class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500">
+                                        <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="flex-1 flex flex-col">
@@ -143,19 +149,31 @@
                         <div class="space-y-5">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">เลือกสถานที่/หน่วยงาน
-                                        <span class="text-red-500">*</span></label>
-                                    <select id="location" name="location"
-                                        class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500">
-                                        <option value="">เลือกสถานที่/หน่วยงาน</option>
-                                        <option value="OPD">OPD</option>
-                                        <option value="IPD">IPD</option>
-                                        <option value="ER">ER</option>
-                                        <option value="ห้องผ่าตัด">ห้องผ่าตัด</option>
-                                        <option value="ศูนย์หัวใจ">ศูนย์หัวใจ</option>
-                                        <option value="ห้องเรียน">ห้องเรียน</option>
-                                        <option value="หน่วยงานสนับสนุน">หน่วยงานสนับสนุน</option>
-                                    </select>
+                                    <label
+                                        class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">เลือกสถานที่/หน่วยงาน
+                                        <span class="text-red-500">*</span>
+                                    </label>
+
+                                    <div class="relative">
+
+                                        <select id="location" name="location"
+                                            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500 appearance-none pr-10">
+                                            <option value="">เลือกสถานที่/หน่วยงาน</option>
+                                            <option value="OPD">OPD</option>
+                                            <option value="IPD">IPD</option>
+                                            <option value="ER">ER</option>
+                                            <option value="ห้องผ่าตัด">ห้องผ่าตัด</option>
+                                            <option value="ศูนย์หัวใจ">ศูนย์หัวใจ</option>
+                                            <option value="ห้องเรียน">ห้องเรียน</option>
+                                            <option value="หน่วยงานสนับสนุน">หน่วยงานสนับสนุน</option>
+                                        </select>
+
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-500">
+                                            <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                                        </div>
+
+                                    </div>
                                 </div>
                                 <div>
                                     <label
