@@ -110,7 +110,7 @@
                             <i data-lucide="heart" class="lg:w-7 lg:h-7"></i>
                         </div>
                         <div class="text-left flex-1">
-                            <h3 class="font-bold text-slate-800 lg:text-lg mb-1">ชื่นชมบุคลากร</h3>
+                            <h3 class="font-bold text-slate-800 lg:text-lg mb-1">ชื่นชมบุคลากรหรือหน่วยงาน</h3>
                             <p class="text-xs lg:text-sm text-slate-500">ส่งต่อกำลังใจให้คนทำงาน</p>
                         </div>
                         <i data-lucide="chevron-right" class="text-slate-300 group-hover:text-pink-400 lg:hidden"></i>

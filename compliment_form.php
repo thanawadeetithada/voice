@@ -33,7 +33,8 @@
                     VOICESRI
                 </h1>
                 <span
-                    class="hidden lg:inline-block text-emerald-200 font-medium border-l border-emerald-500/50 pl-4 ml-2">ชื่นชมบุคลากร/หน่วยงาน</span>
+                    class="text-emerald-200 font-medium border-emerald-500/50">ชื่นชมบุคลากรหรือหน่วยงาน
+</span>
             </div>
 
             <button class="hidden">
@@ -45,7 +46,7 @@
     <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 lg:py-12">
 
         <div class="hidden lg:block mb-8">
-            <h2 class="text-3xl font-bold text-emerald-900">ชื่นชมบุคลากร/หน่วยงาน</h2>
+            <h2 class="text-3xl font-bold text-emerald-900">ชื่นชมบุคลากรหรือหน่วยงาน</h2>
             <p class="hidden lg:block text-slate-600 mt-2 text-lg">ส่งต่อกำลังใจและคำชื่นชมของคุณ
                 เพื่อเป็นพลังบวกให้กับทีมงานของเรา</p>
         </div>
@@ -60,7 +61,7 @@
                         <h3 class="font-bold text-emerald-800 flex items-center gap-3 lg:text-lg">
                             <span
                                 class="bg-emerald-100 text-emerald-700 w-7 h-7 rounded-full flex items-center justify-center text-sm">1</span>
-                            ข้อมูลเรื่องราว
+                            ข้อมูลจากผู้แจ้ง (Voice)
                         </h3>
                     </div>
 
@@ -68,27 +69,61 @@
                         <div>
                             <label class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">ประเภทเรื่อง
                                 <span class="text-red-500">*</span></label>
-                            <select
-                                class="w-full p-3 lg:p-3.5 bg-slate-100 border border-slate-200 rounded-xl text-sm lg:text-base outline-none cursor-not-allowed">
-                                <option selected>ปัญหาการปฏิบัติงาน</option>
-                                <option>ข้อเสนอแนะเพื่อพัฒนา</option>
-                                <option>ชื่นชมบุคลากร/หน่วยงาน</option>
-                                <option>ความปลอดภัย</option>
-                                <option>สิ่งแวดล้อม</option>
-                                <option>เทคโนโลยีสารสนเทศ</option>
-                                <option>ทรัพยากรบุคคล</option>
-                                <option>การเรียนการสอน</option>
-                                <option>งานวิจัย</option>
-                                <option>อื่น ๆ (โปรดระบุในรายละเอียด)</option>
+                            <select id="issue_type" onchange="toggleDetailsRequired()"
+                                class="w-full p-3 lg:p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500 cursor-pointer">
+                                <option value="">เลือกประเภทเรื่อง</option>
+                                <option value="ปัญหาการปฏิบัติงาน">ปัญหาการปฏิบัติงาน</option>
+                                <option value="ข้อเสนอแนะเพื่อพัฒนา">ข้อเสนอแนะเพื่อพัฒนา</option>
+                                <option value="ชื่นชมบุคลากร/หน่วยงาน">ชื่นชมบุคลากร/หน่วยงาน</option>
+                                <option value="ความปลอดภัย">ความปลอดภัย</option>
+                                <option value="สิ่งแวดล้อม">สิ่งแวดล้อม</option>
+                                <option value="เทคโนโลยีสารสนเทศ">เทคโนโลยีสารสนเทศ</option>
+                                <option value="ทรัพยากรบุคคล">ทรัพยากรบุคคล</option>
+                                <option value="การเรียนการสอน">การเรียนการสอน</option>
+                                <option value="งานวิจัย">งานวิจัย</option>
+                                <option value="อื่นๆ">อื่น ๆ (โปรดระบุในรายละเอียด)</option>
                             </select>
                         </div>
 
                         <div class="flex-1 flex flex-col">
-                            <label
-                                class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">รายละเอียดคำชื่นชม
-                                <span class="text-red-500">*</span></label>
-                            <textarea placeholder="พิมพ์ข้อความชื่นชมที่นี่..."
+                            <label class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">
+                                รายละเอียด <span id="required-mark" class="text-red-500 hidden">*</span>
+                            </label>
+                            <textarea id="details" rows="4" placeholder="พิมพ์ข้อความที่ต้องการสื่อสาร..."
                                 class="flex-1 w-full p-3 lg:p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base focus:border-emerald-500 outline-none resize-none lg:min-h-[180px]"></textarea>
+                        </div>
+
+                        <div class="bg-orange-50/50 p-4 lg:p-6 rounded-xl border border-orange-100">
+                            <label class="block text-sm lg:text-base font-medium text-slate-700 mb-3">
+                                ผลกระทบที่เกิดขึ้น (เลือกได้หลายข้อ)
+                            </label>
+
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                                <?php 
+                                $impacts = [
+                                    'กระทบผู้ป่วย', 
+                                    'กระทบนักศึกษา', 
+                                    'กระทบบุคลากร', 
+                                    'กระทบคุณภาพบริการ', 
+                                    'กระทบความปลอดภัย', 
+                                    'กระทบภาพลักษณ์องค์กร',
+                                    'ยังไม่เกิดผลกระทบ แต่มีความเสี่ยง'
+                                ];
+                                
+                                foreach($impacts as $index => $item): 
+                                    $isLastItem = ($index === count($impacts) - 1);
+                                    $colSpanClass = $isLastItem ? 'col-span-2 lg:col-span-3' : '';
+                                ?>
+                                <label
+                                    class="flex items-center gap-2.5 p-2.5 border rounded-lg bg-white border-orange-200 text-sm cursor-pointer hover:border-orange-400 transition-colors <?php echo $colSpanClass; ?>">
+                                    <input type="checkbox" name="impacts[]" value="<?php echo $item; ?>"
+                                        class="rounded w-4 h-4 text-orange-500 focus:ring-orange-500 border-slate-300">
+                                    <span class="text-slate-600 text-xs lg:text-sm">
+                                        <?php echo $item; ?>
+                                    </span>
+                                </label>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </div>
 
@@ -102,19 +137,19 @@
                         <h3 class="font-bold text-emerald-800 flex items-center gap-3 lg:text-lg">
                             <span
                                 class="bg-emerald-100 text-emerald-700 w-7 h-7 rounded-full flex items-center justify-center text-sm">2</span>
-                            สถานที่และหน่วยงานที่ต้องการชื่นชม
+                             ข้อมูลสำหรับการวิเคราะห์
                         </h3>
                     </div>
 
                     <div class="space-y-5">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label
-                                    class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">สถานที่/หน่วยงาน
+                                <label 
+                                class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">เลือกสถานที่/หน่วยงาน
                                     <span class="text-red-500">*</span></label>
                                 <select
                                     class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500">
-                                    <option value="">เลือกสถานที่</option>
+                                    <option value="">เลือกสถานที่/หน่วยงาน</option>
                                     <option>OPD</option>
                                     <option>IPD</option>
                                     <option>ER</option>
@@ -122,19 +157,18 @@
                                     <option>ศูนย์หัวใจ</option>
                                     <option>ห้องเรียน</option>
                                     <option>หน่วยงานสนับสนุน</option>
-
                                 </select>
                             </div>
                             <div>
                                 <label
-                                    class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">วันที่รับบริการ</label>
+                                    class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">วันที่เกิดเหตุ</label>
                                 <input type="date"
                                     class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm lg:text-base outline-none focus:border-emerald-500">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">แนบรูปภาพ
+                            <label class="block text-sm lg:text-base font-medium text-slate-700 mb-1.5">แนบรูปภาพ/เอกสาร
                                 (ไม่บังคับ)</label>
                             <div
                                 class="border-2 border-dashed border-emerald-200 bg-emerald-50/30 rounded-xl p-4 lg:p-5 text-center hover:bg-emerald-50 cursor-pointer transition-colors group">
@@ -154,7 +188,7 @@
                         <h3 class="font-bold text-emerald-800 flex items-center gap-3 lg:text-lg">
                             <span
                                 class="bg-emerald-100 text-emerald-700 w-7 h-7 rounded-full flex items-center justify-center text-sm">3</span>
-                            ผู้ชื่นชม
+                            การติดตามผล
                         </h3>
                     </div>
 
@@ -206,7 +240,7 @@
                 class="lg:col-span-12 pt-4 pb-10 lg:pb-0 flex gap-3 lg:gap-4 lg:justify-end border-t border-emerald-100 lg:border-none lg:mt-4">
                 <button onclick="window.history.back()"
                     class="flex-1 lg:flex-none lg:w-40 py-3.5 px-4 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-colors lg:text-lg">ยกเลิก</button>
-                <button onclick="window.location.href='success.php'"
+                <button onclick="handleSubmit()"
                     class="flex-1 lg:flex-none lg:w-48 py-3.5 px-4 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-colors lg:text-lg">ส่งข้อมูล</button>
             </div>
 
@@ -215,6 +249,36 @@
 
     <script>
     lucide.createIcons();
+
+    function toggleDetailsRequired() {
+        const issueType = document.getElementById('issue_type').value;
+        const requiredMark = document.getElementById('required-mark');
+        
+        if (issueType === 'อื่นๆ') {
+            requiredMark.classList.remove('hidden');
+        } else {
+            requiredMark.classList.add('hidden');
+        }
+    }
+
+    function handleSubmit() {
+        const issueType = document.getElementById('issue_type').value;
+        const details = document.getElementById('details').value.trim();
+
+        if (issueType === "") {
+            alert("กรุณาเลือกประเภทเรื่องก่อนส่งข้อมูลครับ");
+            document.getElementById('issue_type').focus();
+            return;
+        }
+
+        if (issueType === 'อื่นๆ' && details === "") {
+            alert("กรุณาระบุรายละเอียดเพิ่มเติม เนื่องจากท่านเลือกประเภทเรื่อง 'อื่น ๆ'");
+            document.getElementById('details').focus();
+            return;
+        }
+
+        window.location.href = 'success.php';
+    }
     </script>
 </body>
 
