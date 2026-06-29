@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+date_default_timezone_set('Asia/Bangkok');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $form_category = $_POST['form_category'] ?? '';
