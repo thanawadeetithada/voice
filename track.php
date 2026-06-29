@@ -186,7 +186,7 @@ if ($current_index === false) $current_index = 0;
                     </div>
                     <h2 class="text-xl lg:text-2xl font-bold text-slate-800">ไม่พบข้อมูล Ticket ID นี้</h2>
                     <p class="text-slate-500 mt-2">โปรดตรวจสอบหมายเลขอีกครั้ง หรือลองค้นหาใหม่ในหน้าแรกครับ</p>
-                    <button onclick="window.location.href='home.php'" class="mt-6 bg-slate-100 text-slate-600 px-6 py-2 rounded-xl font-medium hover:bg-slate-200 cursor-pointer">กลับหน้าแรก</button>
+                    <button onclick="window.location.href='index.php'" class="mt-6 bg-slate-100 text-slate-600 px-6 py-2 rounded-xl font-medium hover:bg-slate-200 cursor-pointer">กลับหน้าแรก</button>
                 </div>
             <?php endif; ?>
 
